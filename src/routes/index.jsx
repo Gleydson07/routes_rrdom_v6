@@ -6,7 +6,6 @@ import { PrivateRoute } from './PrivateRoute';
 import { PrivateLayout } from '../components/PrivateLayout';
 
 export const Routes = () => {
-
   return (
     <BrowserRouter>
       <Routers>

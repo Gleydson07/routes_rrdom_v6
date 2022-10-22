@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuthentication } from '../../hooks/useAuth';
 import { AllRoutes } from '../../routes/RouteNames';
 
 import {
@@ -8,18 +9,15 @@ import {
 
 export const Login = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState('gleydson.santos@trinusco.com.br');
-  const [password, setPassword] = useState('@Teste123');
+  const { signIn } = useAuthentication();
+  const [user, setUser] = useState('gsantos@gsantos.com');
+  const [password, setPassword] = useState('gsantos');
 
   const handleSubmitForm = async event => {
     event.preventDefault();
 
-    if (
-      user === 'gleydson.santos@trinusco.com.br' && 
-      password === '@Teste123'
-    ) {
-      navigate(AllRoutes.workspaces.route);
-    }
+    await signIn(user, password);
+    navigate(AllRoutes.workspaces.route);
   };
 
   return (

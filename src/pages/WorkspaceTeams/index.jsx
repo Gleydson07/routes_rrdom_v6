@@ -1,5 +1,4 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import {
   Container
@@ -34,7 +33,6 @@ const workspacesTeamsList = [
 ]
 
 export const WorkspaceTeams = () => {
-  const navigate = useNavigate();
 
   return (
     <Container>
