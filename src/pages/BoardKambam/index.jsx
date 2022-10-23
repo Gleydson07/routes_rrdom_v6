@@ -6,12 +6,13 @@ import { replaceRouteParams } from '../../routes/replaceRouteParams';
 import { AllRoutes } from '../../routes/RouteNames';
 
 import {
+  ButtonWorkitem,
   Container, ModalContent
 } from './styles';
 
 export const BoardKambam = () => {
   const navigate = useNavigate();
-  const { getAuth, loadUserAuthorization } = useAuthentication();
+  const { getAuth, hasValidToken, loadUserAuthorization } = useAuthentication();
   const { workspaceId, boardId } = useParams();
   const { search } = useLocation();
   const [ workitemsList, setWorkitemsList ] = useState([]);
@@ -62,7 +63,11 @@ export const BoardKambam = () => {
         return 0;
       }
 
-      setWorkitemsList(workspaces[boardsIndex].boards[workitemsIndex].workitems);
+      const userSession = hasValidToken();
+      setWorkitemsList(workspaces[boardsIndex].boards[workitemsIndex].workitems.map(item => ({
+        ...item,
+        isOwner: item?.ownerId === userSession?.id
+      })));
       setLoading(false);
     })()
   }, [boardId]);
@@ -77,14 +82,14 @@ export const BoardKambam = () => {
         </div>
         :
         <div>
-          {workitemsList.length ? workitemsList.map(({id, name}) => (
-            <button
-              style={{cursor: "pointer", margin: "8px", padding:"8px"}}
+          {workitemsList.length ? workitemsList.map(({id, name, isOwner}) => (
+            <ButtonWorkitem
+              isOwner={isOwner}
               key={id}
               onClick={() => handleClick(id)}
             >
               {name}
-            </button>
+            </ButtonWorkitem>
           )) : <span>Não há dados para listar.</span>}
         </div>
       }
@@ -96,7 +101,7 @@ export const BoardKambam = () => {
         <strong>BoardId: {workitem?.boardId}</strong>
         <strong>Name: {workitem?.name}</strong>
 
-        <div className='valid-access-level'>{isWorkitemOwner ? 'PODE EDITAR' : "NÃO PODE EDITAR"}</div>
+        <div className='valid-access-level'>{isWorkitemOwner ? 'OWNER' : "MEMBER"}</div>
       </ModalContent>
     </Modal>
     </Container>

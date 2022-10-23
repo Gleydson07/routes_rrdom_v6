@@ -39,3 +39,15 @@ export const ModalContent = styled.div`
     margin-top: 8px;
   }
 `;
+
+export const ButtonWorkitem = styled.button`
+  cursor: pointer;
+  margin: 8px; 
+  padding: 8px;
+  border-radius: 4px;
+
+  border: 2px solid ${({ isOwner }) => isOwner ?
+    css` #00ff00` :
+    css` #ff0000`
+  };
+`;
