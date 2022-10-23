@@ -4,13 +4,14 @@ import { useAuthentication } from '../hooks/useAuth';
 import { AllRoutes } from './RouteNames';
 
 export const PrivateRoute = () => {
-  const { authenticated, loading } = useAuthentication();
-
+  const { getAuth, loading } = useAuthentication();
+  const session = getAuth();
+  
   if (loading) {
     return <p>Carregando...</p>
   }
-
-  return authenticated ? (
+  
+  return session?.isValid ? (
     <Outlet/>
   ) : (
     <Navigate to={AllRoutes.login.route} />

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Modal } from '../../components/Modal';
+import { useAuthentication } from '../../hooks/useAuth';
 import { replaceRouteParams } from '../../routes/replaceRouteParams';
 import { AllRoutes } from '../../routes/RouteNames';
 import { api } from '../../services/api';
@@ -11,6 +12,7 @@ import {
 
 export const BoardKambam = () => {
   const navigate = useNavigate();
+  const { getAuth } = useAuthentication();
   const {workspaceId, boardId} = useParams();
   const {search} = useLocation();
   const [workitemsList, setWorkitemsList] = useState([]);
@@ -43,6 +45,7 @@ export const BoardKambam = () => {
 
   useEffect(() => {
     if (search) {
+      getAuth();
       const workitemId = +search.split('=')[1];
       const workitemFiltered = workitemsList.find((item) => item.id === workitemId);
       setWorkitem(workitemFiltered);
