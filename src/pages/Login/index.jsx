@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthentication } from '../../hooks/useAuth';
 import { AllRoutes } from '../../routes/RouteNames';
@@ -9,9 +9,9 @@ import {
 
 export const Login = () => {
   const navigate = useNavigate();
-  const { signIn } = useAuthentication();
-  const [user, setUser] = useState('gsantos@gsantos.com');
-  const [password, setPassword] = useState('gsantos');
+  const { signIn, hasValidToken } = useAuthentication();
+  const [user, setUser] = useState('cxavier@xavier.com');
+  const [password, setPassword] = useState('calebe');
 
   const handleSubmitForm = async event => {
     event.preventDefault();
@@ -19,6 +19,14 @@ export const Login = () => {
     await signIn(user, password);
     navigate(AllRoutes.workspaces.route);
   };
+
+  useEffect(() => {
+    const dataToken = hasValidToken();
+    
+    if (dataToken?.isValid) {
+      navigate(AllRoutes.workspaces.route);
+    }
+  }, [hasValidToken, navigate]);
 
   return (
     <Container>

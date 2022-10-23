@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useAuthentication } from '../../hooks/useAuth';
 import { replaceRouteParams } from '../../routes/replaceRouteParams';
 import { AllRoutes } from '../../routes/RouteNames';
-import { api } from '../../services/api';
 
 import {
   Container
@@ -11,7 +11,7 @@ import {
 export const WorkspaceBoards = () => {
   const navigate = useNavigate();
   const { workspaceId } = useParams();
-  
+  const { loadUserAuthorization } = useAuthentication();
   const [boardsList, setBoardsList] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -24,8 +24,15 @@ export const WorkspaceBoards = () => {
 
   useEffect(() => {
     (async() => {
-      const response = await api.get(`/boards?workspaceId=${workspaceId}`);
-      setBoardsList(response.data);
+      const {workspaces} = await loadUserAuthorization();
+
+      const boardsIndex = workspaces.findIndex(item => item.id === +workspaceId);
+      if (boardsIndex === -1) {
+        navigate(AllRoutes.workspaces.route);
+        return 0;
+      }
+
+      setBoardsList(workspaces[boardsIndex].boards.filter(item => item.workspaceId === +workspaceId));
       setLoading(false);
     })()
   }, [workspaceId]);

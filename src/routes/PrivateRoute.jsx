@@ -11,9 +11,9 @@ export const PrivateRoute = () => {
     return <p>Carregando...</p>
   }
   
-  return session?.isValid ? (
-    <Outlet/>
-  ) : (
-    <Navigate to={AllRoutes.login.route} />
-  );
+  if (session?.isValid){
+    return <Outlet context={{ session }}/>
+  }
+
+  return <Navigate to={AllRoutes.login.route} />
 };

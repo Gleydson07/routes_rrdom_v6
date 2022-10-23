@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 export const Container = styled.section`
   p{
@@ -11,6 +11,29 @@ export const ModalContent = styled.div`
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
+
+  .valid-access-level{
+    width: 100%;
+    text-align: center;
+    font-weight: 700;
+    padding: 8px;
+    border-radius: 4px;
+    margin-top: 16px;
+    
+    ${({ isOwner }) => isOwner ? 
+      css`
+        color: #002f00;
+        background: #00ff00;
+        border: 2px solid #00ae00;
+        ` 
+      : 
+      css`
+        color: #ffffff;
+        background: #ff0000;
+        border: 2px solid #840000;
+      `
+    };
+  }
 
   strong{
     margin-top: 8px;

@@ -4,7 +4,6 @@ import { Modal } from '../../components/Modal';
 import { useAuthentication } from '../../hooks/useAuth';
 import { replaceRouteParams } from '../../routes/replaceRouteParams';
 import { AllRoutes } from '../../routes/RouteNames';
-import { api } from '../../services/api';
 
 import {
   Container, ModalContent
@@ -12,13 +11,14 @@ import {
 
 export const BoardKambam = () => {
   const navigate = useNavigate();
-  const { getAuth } = useAuthentication();
-  const {workspaceId, boardId} = useParams();
-  const {search} = useLocation();
-  const [workitemsList, setWorkitemsList] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [workitem, setWorkitem] = useState(null);
-  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const { getAuth, loadUserAuthorization } = useAuthentication();
+  const { workspaceId, boardId } = useParams();
+  const { search } = useLocation();
+  const [ workitemsList, setWorkitemsList ] = useState([]);
+  const [ loading, setLoading ] = useState(true);
+  const [ workitem, setWorkitem ] = useState(null);
+  const [ isWorkitemOwner, setIsWorkitemOwner ] = useState(false);
+  const [ modalIsOpen, setModalIsOpen ] = useState(false);
 
   const handleClick = (id) => {
     navigate(replaceRouteParams(AllRoutes.boardKambam.route, [
@@ -36,22 +36,38 @@ export const BoardKambam = () => {
   }
 
   useEffect(() => {
-    (async() => {
-      const response = await api.get(`/workitems?boardId=${boardId}`);
-      setWorkitemsList(response.data);
-      setLoading(false);
-    })()
-  }, [boardId]);
-
-  useEffect(() => {
     if (search) {
-      getAuth();
+      const session = getAuth();
       const workitemId = +search.split('=')[1];
       const workitemFiltered = workitemsList.find((item) => item.id === workitemId);
       setWorkitem(workitemFiltered);
       setModalIsOpen(!!workitemFiltered);
+      setIsWorkitemOwner(workitemFiltered.ownerId === session?.id);
+
+      console.log(workitemFiltered, workitemId.ownerId, session?.id)
     }
-  }, [search, workitemsList]);
+  }, [search, workitemsList, getAuth]);
+
+  useEffect(() => {
+    (async() => {
+      const {workspaces} = await loadUserAuthorization();
+
+      const boardsIndex = workspaces.findIndex(item => item.id === +workspaceId);
+      if (boardsIndex === -1) {
+        navigate(AllRoutes.workspaces.route);
+        return 0;
+      }
+      
+      const workitemsIndex = workspaces[boardsIndex].boards.findIndex(item => item.id === +boardId);
+      if (workitemsIndex === -1) {
+        navigate(AllRoutes.workspaces.route);
+        return 0;
+      }
+
+      setWorkitemsList(workspaces[boardsIndex].boards[workitemsIndex].workitems);
+      setLoading(false);
+    })()
+  }, [boardId]);
 
   return (
     <Container>
@@ -76,11 +92,13 @@ export const BoardKambam = () => {
       }
 
     <Modal isOpen={modalIsOpen} onClose={handleCloseModal}>
-      <ModalContent>
+      <ModalContent isOwner={isWorkitemOwner}>
         <h4>Detalhes do item de trabalho:</h4>
         <strong>Id: {workitem?.id}</strong>
         <strong>BoardId: {workitem?.boardId}</strong>
         <strong>Name: {workitem?.name}</strong>
+
+        <div className='valid-access-level'>{isWorkitemOwner ? 'PODE EDITAR' : "NÃO PODE EDITAR"}</div>
       </ModalContent>
     </Modal>
     </Container>

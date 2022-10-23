@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {replaceRouteParams} from '../../routes/replaceRouteParams';
 import { AllRoutes } from '../../routes/RouteNames';
-import { api } from '../../services/api';
+import { useAuthentication } from '../../hooks/useAuth';
 
 import {
   Container
@@ -10,19 +10,20 @@ import {
 
 export const Workspaces = () => {
   const navigate = useNavigate();
+  const { loadUserAuthorization } = useAuthentication();
   const [workspacesList, setWorkspacesList] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const handleClick = (id) => {
     navigate(replaceRouteParams(AllRoutes.workspaceBoards.route, [
       {name: 'workspaceId', value: id}
-    ]), id);
+    ]));
   }
 
   useEffect(() => {
     (async() => {
-      const response = await api.get('/workspaces');
-      setWorkspacesList(response.data);
+      const { workspaces } = await loadUserAuthorization();
+      setWorkspacesList(workspaces);
       setLoading(false);
     })()
   }, [])
