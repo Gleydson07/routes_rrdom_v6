@@ -74,7 +74,6 @@ export const AuthenticationProvider = ({ children }) => {
     try {
       const dataToken = hasValidToken();
       const { data } = await api.get(`/authorization?userId=${dataToken?.id}`);
-      console.log(data[0])
   
       return data[0];
     } catch (error) {

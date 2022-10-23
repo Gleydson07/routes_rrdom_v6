@@ -42,9 +42,7 @@ export const BoardKambam = () => {
       const workitemFiltered = workitemsList.find((item) => item.id === workitemId);
       setWorkitem(workitemFiltered);
       setModalIsOpen(!!workitemFiltered);
-      setIsWorkitemOwner(workitemFiltered.ownerId === session?.id);
-
-      console.log(workitemFiltered, workitemId.ownerId, session?.id)
+      setIsWorkitemOwner(workitemFiltered?.ownerId === session?.id);
     }
   }, [search, workitemsList, getAuth]);
 
